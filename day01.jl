@@ -1,3 +1,4 @@
+# return the tuple of solutions for part1 and part2
 function day01(path)
     totals = [0]
     for line in readlines(path)
@@ -11,5 +12,5 @@ function day01(path)
     return totals[1], sum(totals[1:3])
 end
 
-println(day01(ARGS[1]))
+println(day01("day01.txt"))
 
