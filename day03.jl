@@ -1,5 +1,3 @@
-using .Iterators
-
 function split_in_half(line)
     l = div(length(line), 2)
     return line[1:l], line[l+1:end]
@@ -16,7 +14,7 @@ function day03a()
 end
 
 function day03b()
-    groups = partition([line for line in readlines("day03.txt")], 3)
+    groups = Base.Iterators.partition([line for line in readlines("day03.txt")], 3)
     print_priorities([pop!(intersect(Set(group[1]), Set(group[2]), Set(group[3]))) for group in groups])
 end
 
