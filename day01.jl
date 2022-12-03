@@ -1,16 +1,21 @@
-# return the tuple of solutions for part1 and part2
-function day01(path)
-    totals = [0]
-    for line in readlines(path)
+function split_by_elf(input)
+    result = [[]]
+    for line in input
         if line == ""
-            push!(totals, 0)
+            push!(result, [])
         else
-            totals[end] += parse(Int, line)
+            push!(result[end], line)
         end
     end
-    partialsort!(totals, 3, rev=true)
-    return totals[1], sum(totals[1:3])
+    return result
 end
 
-println(day01("day01.txt"))
+elf_calories(calories) = sum(parse(Int, line) for line in calories)
 
+read_data() = readlines("day01.txt") |> split_by_elf .|> elf_calories
+
+# part 1
+read_data() |> maximum |> println
+
+# part 2
+read_data() |> x -> partialsort(x, 1:3, rev=true) |> sum |> println
