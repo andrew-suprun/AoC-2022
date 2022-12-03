@@ -1,22 +1,14 @@
 function split_in_half(line)
     l = div(length(line), 2)
-    return line[1:l], line[l+1:end]
+    return [line[1:l], line[l+1:end]]
 end
 
 priority(letter) = letter >= 'a' && letter <= 'z' ? letter - 'a' + 1 : letter - 'A' + 27
 
-print_priorities(letters) = println(sum(priority(letter) for letter in letters))
+print_priorities(letters) = (letters .|> x -> intersect(x...) |> first |> priority) |> sum |> println
 
-function day03a()
-    pairs = (split_in_half(line) for line in readlines("day03.txt"))
-    print_priorities(pop!(intersect(Set(pair[1]), Set(pair[2]))) for pair in pairs)
-end
+# part 1
+readlines("day03.txt") .|> split_in_half |> print_priorities
 
-function day03b()
-    groups = Base.Iterators.partition((line for line in readlines("day03.txt")), 3)
-    print_priorities(pop!(intersect(Set(group[1]), Set(group[2]), Set(group[3]))) for group in groups)
-end
-
-day03a()
-day03b()
-
+# part 2
+readlines("day03.txt") |> x -> Base.Iterators.partition(x, 3) |> print_priorities
