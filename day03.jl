@@ -7,13 +7,7 @@ function split_in_half(line)
     return SubString(line, 1, l), SubString(line, l + 1)
 end
 
-function priority(letter)
-    if letter >= 'a' && letter <= 'z'
-        return letter - 'a' + 1
-    else
-        return letter - 'A' + 27
-    end
-end
+priority(letter) = letter >= 'a' && letter <= 'z' ? letter - 'a' + 1 : letter - 'A' + 27
 
 function day03a()
     lines = read_lines()
