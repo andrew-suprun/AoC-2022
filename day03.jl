@@ -8,14 +8,14 @@ priority(letter) = letter >= 'a' && letter <= 'z' ? letter - 'a' + 1 : letter - 
 print_priorities(letters) = println(sum(priority(letter) for letter in letters))
 
 function day03a()
-    lines = [line for line in readlines("day03.txt")]
-    pairs = [split_in_half(line) for line in lines]
-    print_priorities([pop!(intersect(Set(pair[1]), Set(pair[2]))) for pair in pairs])
+    lines = (line for line in readlines("day03.txt"))
+    pairs = (split_in_half(line) for line in lines)
+    print_priorities(pop!(intersect(Set(pair[1]), Set(pair[2]))) for pair in pairs)
 end
 
 function day03b()
     groups = Base.Iterators.partition((line for line in readlines("day03.txt")), 3)
-    print_priorities([pop!(intersect(Set(group[1]), Set(group[2]), Set(group[3]))) for group in groups])
+    print_priorities(pop!(intersect(Set(group[1]), Set(group[2]), Set(group[3]))) for group in groups)
 end
 
 day03a()
