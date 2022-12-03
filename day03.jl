@@ -8,8 +8,7 @@ priority(letter) = letter >= 'a' && letter <= 'z' ? letter - 'a' + 1 : letter - 
 print_priorities(letters) = println(sum(priority(letter) for letter in letters))
 
 function day03a()
-    lines = (line for line in readlines("day03.txt"))
-    pairs = (split_in_half(line) for line in lines)
+    pairs = (split_in_half(line) for line in readlines("day03.txt"))
     print_priorities(pop!(intersect(Set(pair[1]), Set(pair[2]))) for pair in pairs)
 end
 
