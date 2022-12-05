@@ -32,20 +32,17 @@ end
 
 function cratemover_9000(stacks, ncrates, source, target)
     for _ in 1:ncrates
-        crate = pop!(stacks[source])
-        push!(stacks[target], crate)
+        push!(stacks[target], pop!(stacks[source]))
     end
 end
 
 function cratemover_9001(stacks, ncrates, source, target)
     tmp = Vector{Char}()
     for _ in 1:ncrates
-        crate = pop!(stacks[source])
-        push!(tmp, crate)
+        push!(tmp, pop!(stacks[source]))
     end
     for _ in 1:ncrates
-        crate = pop!(tmp)
-        push!(stacks[target], crate)
+        push!(stacks[target], pop!(tmp))
     end
 end
 
