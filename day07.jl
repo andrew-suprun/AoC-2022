@@ -7,7 +7,7 @@ mutable struct Dir
     Dir(name; parent=nothing) = new(name, Vector{Dir}(), 0, parent)
 end
 
-function command(line, wd)
+function parse_command(line, wd)
     cmd_line = split(line, ' ')
     if cmd_line[2] == "cd"
         name = cmd_line[3]
@@ -22,8 +22,8 @@ function command(line, wd)
     return wd
 end
 
-function file(line, wd)
-    (size, _) = split(line, " ")
+function parse_file(line, wd)
+    (size,) = split(line, " ")
     wd.size += parse(Int, size)
 end
 
@@ -32,9 +32,9 @@ function parse_input(path)
     wd = root
     for line in readlines(path)
         if startswith(line, "\$ ")
-            wd = command(line, wd)
+            wd = parse_command(line, wd)
         elseif !startswith(line, "dir")
-            file(line, wd)
+            parse_file(line, wd)
         end
     end
     return root
@@ -54,24 +54,24 @@ function print_tree(dir; level=0)
     end
 end
 
-function sum_small_dirs(dir)
+function part1(dir)
     total = 0
     for subdir in dir.subdirs
         if subdir.size <= 100000
             total += subdir.size
         end
-        total += sum_small_dirs(subdir)
+        total += part1(subdir)
     end
     return total
 
 end
 
-function find_suitable_dir(dir, min_size, max_size)
+function part2(dir, min_size, max_size)
     for subdir in dir.subdirs
         if subdir.size >= min_size && subdir.size < max_size
             max_size = subdir.size
         end
-        max_size = find_suitable_dir(subdir, min_size, max_size)
+        max_size = part2(subdir, min_size, max_size)
     end
     return max_size
 end
@@ -81,11 +81,9 @@ function day07(path)
     total_size(root)
     print_tree(root)
 
-    # part 1
-    println(sum_small_dirs(root))
+    println(part1(root))
 
-    # part 2
-    println(find_suitable_dir(root, root.size - 40_000_000, 70_000_000))
+    println(part2(root, root.size - 40_000_000, 70_000_000))
 end
 
 day07("day07.txt")
