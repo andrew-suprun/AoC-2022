@@ -81,14 +81,9 @@ function day07(path)
     total_size(root)
     print_tree(root)
 
-    println(part1(root))
+    println(part1(root)) # 1325919
 
-    println(part2(root, root.size - 40_000_000, 70_000_000))
+    println(part2(root, root.size - 40_000_000, 70_000_000)) # 2050735
 end
 
 day07("day07.txt")
-
-# ----
-# 1325919
-# 2050735
-# ----
