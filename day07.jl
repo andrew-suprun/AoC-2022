@@ -54,7 +54,7 @@ function walk_tree(f, dir; level=0)
     end
 end
 
-function print_tree(root; level=0)
+function print_tree(root)
     walk_tree(root) do dir, level
         println("$("    "^level)$(dir.name): $(dir.size)")
     end
