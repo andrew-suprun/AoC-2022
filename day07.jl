@@ -47,22 +47,16 @@ function total_size(dir)
     return dir.size
 end
 
-function walk_tree(f, dir; level=0)
-    f(dir, level)
+function walk_tree(f, dir)
+    f(dir)
     for subdir in dir.subdirs
-        walk_tree(f, subdir, level=level + 1)
-    end
-end
-
-function print_tree(root)
-    walk_tree(root) do dir, level
-        println("$("    "^level)$(dir.name): $(dir.size)")
+        walk_tree(f, subdir)
     end
 end
 
 function part1(root)
     total = 0
-    walk_tree(root) do dir, _
+    walk_tree(root) do dir
         if dir.size <= 100000
             total += dir.size
         end
@@ -72,7 +66,7 @@ end
 
 function part2(root, min_size)
     size = 70_000_000
-    walk_tree(root) do dir, _
+    walk_tree(root) do dir
         if dir.size > min_size && dir.size < size
             size = dir.size
         end
@@ -82,7 +76,6 @@ end
 
 root = parse_input("day07.txt")
 total_size(root)
-print_tree(root)
 
 part1(root)                         # 1325919
 part2(root, root.size - 40_000_000) # 2050735
