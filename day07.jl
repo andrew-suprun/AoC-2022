@@ -68,7 +68,6 @@ function part1(root)
         end
     end
     println("part 1: $total")
-
 end
 
 function part2(root, min_size)
@@ -81,13 +80,9 @@ function part2(root, min_size)
     println("part 2: $size")
 end
 
-function day07(path)
-    root = parse_input(path)
-    total_size(root)
-    print_tree(root)
+root = parse_input("day07.txt")
+total_size(root)
+print_tree(root)
 
-    part1(root)                         # 1325919
-    part2(root, root.size - 40_000_000) # 2050735
-end
-
-day07("day07.txt")
+part1(root)                         # 1325919
+part2(root, root.size - 40_000_000) # 2050735
