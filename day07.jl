@@ -1,40 +1,28 @@
 mutable struct Dir
-    name::String
     subdirs::Vector{Dir}
     size::Int
     parent::Union{Nothing,Dir}
 
-    Dir(name; parent=nothing) = new(name, Vector{Dir}(), 0, parent)
-end
-
-function parse_command(line, wd)
-    cmd_line = split(line, ' ')
-    if cmd_line[2] == "cd"
-        name = cmd_line[3]
-        if name == ".."
-            wd = wd.parent
-        elseif name != "/"
-            subdir = Dir(name, parent=wd)
-            push!(wd.subdirs, subdir)
-            wd = subdir
-        end
-    end
-    return wd
-end
-
-function parse_file(line, wd)
-    (size,) = split(line, " ")
-    wd.size += parse(Int, size)
+    Dir(; parent=nothing) = new(Vector{Dir}(), 0, parent)
 end
 
 function parse_input(path)
-    root = Dir("/")
+    root = Dir()
     wd = root
     for line in readlines(path)
-        if startswith(line, "\$ ")
-            wd = parse_command(line, wd)
+        cmd_line = split(line, ' ')
+        if cmd_line[1] == "\$"
+            if cmd_line[2] == "cd"
+                if cmd_line[3] == ".."
+                    wd = wd.parent
+                elseif cmd_line[3] != "/"
+                    subdir = Dir(parent=wd)
+                    push!(wd.subdirs, subdir)
+                    wd = subdir
+                end
+            end
         elseif !startswith(line, "dir")
-            parse_file(line, wd)
+            wd.size += parse(Int, cmd_line[1])
         end
     end
     return root
@@ -61,7 +49,7 @@ function part1(root)
             total += dir.size
         end
     end
-    println("part 1: $total")
+    return total
 end
 
 function part2(root, min_size)
@@ -71,11 +59,11 @@ function part2(root, min_size)
             size = dir.size
         end
     end
-    println("part 2: $size")
+    return size
 end
 
 root = parse_input("day07.txt")
 total_size(root)
 
-part1(root)                         # 1325919
-part2(root, root.size - 40_000_000) # 2050735
+println(part1(root))                         # 1325919
+println(part2(root, root.size - 40_000_000)) # 2050735
