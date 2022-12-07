@@ -47,33 +47,38 @@ function total_size(dir)
     return dir.size
 end
 
-function print_tree(dir; level=0)
-    println("$("    "^level)$(dir.name): $(dir.size)")
+function walk_tree(f, dir; level=0)
+    f(dir, level)
     for subdir in dir.subdirs
-        print_tree(subdir, level=level + 1)
+        walk_tree(f, subdir, level=level + 1)
     end
 end
 
-function part1(dir)
+function print_tree(root; level=0)
+    walk_tree(root) do dir, level
+        println("$("    "^level)$(dir.name): $(dir.size)")
+    end
+end
+
+function part1(root)
     total = 0
-    for subdir in dir.subdirs
-        if subdir.size <= 100000
-            total += subdir.size
+    walk_tree(root) do dir, _
+        if dir.size <= 100000
+            total += dir.size
         end
-        total += part1(subdir)
     end
-    return total
+    println("part 1: $total")
 
 end
 
-function part2(dir, min_size, max_size)
-    for subdir in dir.subdirs
-        if subdir.size >= min_size && subdir.size < max_size
-            max_size = subdir.size
+function part2(root, min_size)
+    size = 70_000_000
+    walk_tree(root) do dir, _
+        if dir.size > min_size && dir.size < size
+            size = dir.size
         end
-        max_size = part2(subdir, min_size, max_size)
     end
-    return max_size
+    println("part 2: $size")
 end
 
 function day07(path)
@@ -81,9 +86,8 @@ function day07(path)
     total_size(root)
     print_tree(root)
 
-    println(part1(root)) # 1325919
-
-    println(part2(root, root.size - 40_000_000, 70_000_000)) # 2050735
+    part1(root)                         # 1325919
+    part2(root, root.size - 40_000_000) # 2050735
 end
 
 day07("day07.txt")
