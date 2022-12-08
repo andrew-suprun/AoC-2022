@@ -1,5 +1,4 @@
-function day08(path)
-    lines = readlines(path)
+function day08(lines)
     ncols = length(lines[1])
     nlines = length(lines)
     grid = [parse(Int, lines[line][col]) for line in 1:nlines, col in 1:ncols]
@@ -13,7 +12,6 @@ function day08(path)
                all(v < height for v in grid[line, col+1:ncols])
     end
     part1 = sum(visible(line, col) for line in 1:nlines, col in 1:ncols)
-    println("Part 1: $(sum(part1))")
 
     # Part 2
     visible_trees = function (height, slice)
@@ -34,7 +32,8 @@ function day08(path)
         visible_trees(height, grid[line+1:nlines, col])
 
     part2 = maximum(all_directions(grid[line, col], line, col) for line in 1:nlines, col in 1:ncols)
-    println("Part 2: $part2")
+    return part1, part2
 end
 
-day08("day08.txt")
+part1, part2 = day08(readlines("day08.txt"))
+println("Part 1: $part1\nPart 2: $part2")
