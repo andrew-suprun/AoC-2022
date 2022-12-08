@@ -6,10 +6,10 @@ mutable struct Dir
     Dir(; parent=nothing) = new(Vector{Dir}(), 0, parent)
 end
 
-function parse_input(path)
+function parse_input(lines)
     root = Dir()
     wd = root
-    for line in readlines(path)
+    for line in lines
         cmd_line = split(line, ' ')
         if cmd_line[1] == "\$"
             if cmd_line[2] == "cd"
@@ -62,8 +62,9 @@ function part2(root, min_size)
     return size
 end
 
-root = parse_input("day07.txt")
+lines = readlines("day07.txt")
+root = parse_input(lines)
 total_size(root)
 
-println(part1(root))                         # 1325919
-println(part2(root, root.size - 40_000_000)) # 2050735
+println("Part 1: $(part1(root))")                         # 1325919
+println("Part 2: $(part2(root, root.size - 40_000_000))") # 2050735
