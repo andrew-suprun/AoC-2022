@@ -5,10 +5,13 @@ function day08(path)
     grid = [parse(Int, lines[line][col]) for line in 1:nlines, col in 1:ncols]
 
     # Part 1
-    visible(line, col) = all(v < grid[line, col] for v in grid[1:line-1, col]) ||
-                         all(v < grid[line, col] for v in grid[line+1:nlines, col]) ||
-                         all(v < grid[line, col] for v in grid[line, 1:col-1]) ||
-                         all(v < grid[line, col] for v in grid[line, col+1:ncols])
+    visible = function (line, col)
+        height = grid[line, col]
+        return all(v < height for v in grid[1:line-1, col]) ||
+               all(v < height for v in grid[line+1:nlines, col]) ||
+               all(v < height for v in grid[line, 1:col-1]) ||
+               all(v < height for v in grid[line, col+1:ncols])
+    end
     part1 = sum(visible(line, col) for line in 1:nlines, col in 1:ncols)
     println("Part 1: $(sum(part1))")
 
