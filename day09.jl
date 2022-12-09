@@ -36,32 +36,6 @@ function day09(lines, elves)
         end
     end
 
-    # Visualize the solution
-    minx = miny = maxx = maxy = 0
-    for v in visited
-        if minx > v[1]
-            minx = v[1]
-        elseif maxx < v[1]
-            maxx = v[1]
-        end
-        if miny > v[2]
-            miny = v[2]
-        elseif maxy < v[2]
-            maxy = v[2]
-        end
-    end
-
-    for y in maxy:-1:miny
-        for x in minx:maxx
-            if (x, y) in visited
-                print('#')
-            else
-                print('.')
-            end
-        end
-        println()
-    end
-
     return length(visited)
 end
 
