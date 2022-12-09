@@ -39,8 +39,6 @@ function day09(lines, elves)
     return length(visited)
 end
 
-println("Part 1:")
 part1 = day09(readlines("day09.txt"), 2)  # 5883
-println("\n\n\n\nPart 2:")
 part2 = day09(readlines("day09.txt"), 10) # 2367
 println("Part 1: $part1\nPart 2: $part2")
