@@ -35,5 +35,5 @@ function day08(lines)
     return part1, part2
 end
 
-part1, part2 = day08(readlines("day08.txt"))
+part1, part2 = day08(readlines("day08.txt")) # 1820, 385112
 println("Part 1: $part1\nPart 2: $part2")
