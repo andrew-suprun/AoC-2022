@@ -25,7 +25,6 @@ function day09(lines, elves)
         push!(visited, knots[end])
     end
 
-
     cmds = map(lines) do line
         cmd, nstr = split(line)
         cmd[1], parse(Int, nstr)
