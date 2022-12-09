@@ -16,8 +16,7 @@ function day09(lines, elves)
         offset = offsets[cmd]
         knots[1] = (knots[1][1] + offset[1], knots[1][2] + offset[2])
         for i in 2:length(knots)
-            prev = knots[i-1]
-            next = knots[i]
+            prev, next = knots[i-1], knots[i]
             diff = diffs[(prev[1] - next[1], prev[2] - next[2])]
             knots[i] = (next[1] + diff[1], next[2] + diff[2])
         end
