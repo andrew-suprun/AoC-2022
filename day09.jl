@@ -12,7 +12,7 @@ function day09(lines, elves)
     knots = fill((0, 0), elves)
     visited = Set{Tuple{Int,Int}}()
 
-    move = function (cmd)
+    function move(cmd)
         offset = offsets[cmd]
         knots[1] = (knots[1][1] + offset[1], knots[1][2] + offset[2])
         for i in 2:length(knots)

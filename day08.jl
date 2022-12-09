@@ -4,7 +4,7 @@ function day08(lines)
     grid = [parse(Int, lines[line][col]) for line in 1:nlines, col in 1:ncols]
 
     # Part 1
-    visible = function (line, col)
+    function visible(line, col)
         height = grid[line, col]
         return all(v < height for v in grid[1:line-1, col]) ||
                all(v < height for v in grid[line+1:nlines, col]) ||
@@ -14,7 +14,7 @@ function day08(lines)
     part1 = sum(visible(line, col) for line in 1:nlines, col in 1:ncols)
 
     # Part 2
-    visible_trees = function (height, slice)
+    function visible_trees(height, slice)
         count = 0
         for v in slice
             count += 1
