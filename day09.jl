@@ -9,8 +9,6 @@ function day09(lines, elves)
         (2, -2) => (1, -1), (2, -1) => (1, -1), (2, 0) => (1, 0), (2, 1) => (1, 1), (2, 2) => (1, 1),
     )
 
-    visited = Set{Tuple{Int,Int}}()
-
     knots = fill((0, 0), elves)
     visited = Set{Tuple{Int,Int}}()
 
