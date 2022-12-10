@@ -19,7 +19,7 @@ function day10(lines)
     for (cycle, x) in enumerate(trace)
         pos = rem(cycle - 1, 40)
         pos == 0 && println()
-        abs(pos - x) <= 1 ? print("#") : print(" ")
+        abs(pos - x) <= 1 ? print("██") : print("  ")
     end
     println()
 end
