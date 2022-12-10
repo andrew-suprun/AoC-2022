@@ -25,11 +25,7 @@ function day10(lines)
         if pos == 0
             println()
         end
-        if abs(pos - x) <= 1
-            print("#")
-        else
-            print(" ")
-        end
+        abs(pos - x) <= 1 ? print("#") : print(" ")
     end
     println()
 end
