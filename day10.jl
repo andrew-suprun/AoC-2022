@@ -11,11 +11,7 @@ function day10(lines)
         end
     end
 
-    # part 1: 
-    part1 = 0
-    for i in 20:40:length(trace)
-        part1 += i * trace[i]
-    end
+    part1 = sum(i * trace[i] for i in 20:40:length(trace))
     println("Part 1: $part1") # 14620
 
     # part 2:
