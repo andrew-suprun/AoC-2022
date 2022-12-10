@@ -6,7 +6,7 @@ function day07(lines)
         if cmd_line[1] == "\$"
             if cmd_line[2] == "cd"
                 if cmd_line[3] == ".."
-                    cwd = copy(cwd[1:end-1])
+                    cwd = cwd[1:end-1]
                 elseif cmd_line[3] != "/"
                     cwd = push!(copy(cwd), cmd_line[3])
                 end
