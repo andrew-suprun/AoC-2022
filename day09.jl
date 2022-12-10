@@ -13,8 +13,7 @@ function day09(lines, elves)
     visited = Set{Tuple{Int,Int}}()
 
     function move(cmd)
-        offset = offsets[cmd]
-        knots[1] = (knots[1][1] + offset[1], knots[1][2] + offset[2])
+        knots[1] = (knots[1][1] + offsets[cmd][1], knots[1][2] + offsets[cmd][2])
         for i in 2:length(knots)
             prev, next = knots[i-1], knots[i]
             diff = diffs[(prev[1] - next[1], prev[2] - next[2])]
