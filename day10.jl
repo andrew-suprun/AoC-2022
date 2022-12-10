@@ -1,19 +1,13 @@
 function day10(lines)
     trace = [1]
 
-    noop = () -> push!(trace, trace[end])
-
-    function addx(v)
-        push!(trace, trace[end])
-        push!(trace, trace[end] + v)
-    end
-
     for line in lines
         (code, params...) = split(line)
         if code == "noop"
-            noop()
+            push!(trace, trace[end])
         elseif code == "addx"
-            addx(parse(Int, params[1]))
+            push!(trace, trace[end])
+            push!(trace, trace[end] + parse(Int, params[1]))
         end
     end
 
