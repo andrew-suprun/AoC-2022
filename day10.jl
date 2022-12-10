@@ -8,11 +8,6 @@ function day10(lines)
         push!(trace, trace[end] + v)
     end
 
-    ISA = Dict(
-        "noop" => noop,
-        "addx" => addx,
-    )
-
     for line in lines
         (code, params...) = split(line)
         if code == "noop"
