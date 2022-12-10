@@ -18,9 +18,7 @@ function day10(lines)
     print("Part 2:") # BJFRHRFU
     for (cycle, x) in enumerate(trace)
         pos = rem(cycle - 1, 40)
-        if pos == 0
-            println()
-        end
+        pos == 0 && println()
         abs(pos - x) <= 1 ? print("#") : print(" ")
     end
     println()
