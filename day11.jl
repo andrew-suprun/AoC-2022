@@ -55,5 +55,11 @@ function day11(lines, part, rounds)
     return inspected[1] * inspected[2]
 end
 
-println(day11(readlines("day11.txt"), :part1, 20))
-println(day11(readlines("day11.txt"), :part2, 10_000))
+using BenchmarkTools
+println(@btime day11(readlines("day11.txt"), :part1, 20))
+println(@btime day11(readlines("day11.txt"), :part2, 10_000))
+
+# 114.500 μs (542 allocations: 44.09 KiB)
+# 57838
+#   60.659 ms (3597332 allocations: 54.93 MiB)
+# 15050382231
