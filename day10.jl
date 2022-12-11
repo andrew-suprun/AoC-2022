@@ -11,8 +11,6 @@ function day10(lines)
         end
     end
 
-    trace = trace[1:end-1]
-
     part1 = sum(i * trace[i] for i in 20:40:length(trace))
     println("Part 1: $part1") # 14620
 
@@ -23,6 +21,7 @@ function day10(lines)
         pos == 0 && println()
         pos in x-1:x+1 ? print("██") : print("  ")
     end
+    println()
 end
 
 day10(readlines("day10.txt"))
