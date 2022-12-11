@@ -14,9 +14,9 @@ function day11(lines, part, rounds)
     lines = strip.(lines)
     for line in lines
         terms = split(line, [',', ' '])
-        if startswith(line, "Starting items: ")
+        if startswith(line, "Starting")
             monkey.items = map(x -> parse(Int, x), [terms[i] for i in 3:2:length(terms)])
-        elseif startswith(line, "Operation: new = ")
+        elseif startswith(line, "Operation")
             if terms[6] == "old"
                 monkey.operation = x -> x * x
             elseif terms[5] == "+"
@@ -26,11 +26,11 @@ function day11(lines, part, rounds)
                 op = parse(Int, terms[6])
                 monkey.operation = (x) -> x * op
             end
-        elseif startswith(line, "Test: divisible by ")
+        elseif startswith(line, "Test")
             monkey.divisible = parse(Int, terms[4])
-        elseif startswith(line, "If true: throw to monkey ")
+        elseif startswith(line, "If true")
             monkey.iftrue = parse(Int, terms[6])
-        elseif startswith(line, "If false: throw to monkey ")
+        elseif startswith(line, "If false")
             monkey.iffalse = parse(Int, terms[6])
             push!(monkeys, monkey)
             monkey = Monkey()
@@ -44,17 +44,9 @@ function day11(lines, part, rounds)
             while !isempty(monkey.items)
                 monkey.inspected += 1
                 item = popfirst!(monkey.items)
-                if part === :part1
-                    level = div(monkey.operation(item), 3)
-                else
-                    level = monkey.operation(item)
-                    level = rem(level, common_divisor)
-                end
-                if rem(level, monkey.divisible) == 0
-                    push!(monkeys[monkey.iftrue+1].items, level)
-                else
-                    push!(monkeys[monkey.iffalse+1].items, level)
-                end
+                level = part === :part1 ? div(monkey.operation(item), 3) : rem(monkey.operation(item), common_divisor)
+                target = rem(level, monkey.divisible) == 0 ? monkey.iftrue : monkey.iffalse
+                push!(monkeys[target+1].items, level)
             end
         end
     end
