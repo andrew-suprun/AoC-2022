@@ -15,7 +15,7 @@ function day11(lines, part, rounds)
     for line in lines
         terms = split(line, [',', ' '])
         if startswith(line, "Starting")
-            monkey.items = map(x -> parse(Int, x), [terms[i] for i in 3:2:length(terms)])
+            monkey.items = map(x -> parse(Int, x), (terms[i] for i in 3:2:length(terms)))
         elseif startswith(line, "Operation")
             if terms[6] == "old"
                 monkey.operation = x -> x * x
