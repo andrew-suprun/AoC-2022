@@ -37,14 +37,14 @@ function day11(lines, part, rounds)
         end
     end
 
-    common_divisor = prod(monkeys .|> m -> m.divisible)
+    common_multiple = lcm(monkeys .|> m -> m.divisible)
 
     for _ in 1:rounds
         for (i, monkey) in enumerate(monkeys)
             while !isempty(monkey.items)
                 monkey.inspected += 1
                 item = popfirst!(monkey.items)
-                level = part === :part1 ? div(monkey.operation(item), 3) : rem(monkey.operation(item), common_divisor)
+                level = part === :part1 ? div(monkey.operation(item), 3) : rem(monkey.operation(item), common_multiple)
                 target = rem(level, monkey.divisible) == 0 ? monkey.iftrue : monkey.iffalse
                 push!(monkeys[target+1].items, level)
             end
@@ -59,7 +59,7 @@ using BenchmarkTools
 println(@btime day11(readlines("day11.txt"), :part1, 20))
 println(@btime day11(readlines("day11.txt"), :part2, 10_000))
 
-# 114.500 μs (542 allocations: 44.09 KiB)
+#   114.500 μs (542 allocations: 44.09 KiB)
 # 57838
 #   60.659 ms (3597332 allocations: 54.93 MiB)
 # 15050382231
