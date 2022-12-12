@@ -45,7 +45,7 @@ end
 function part1(root)
     total = 0
     walk_tree(root) do dir
-        if dir.size <= 100000
+        if dir.size ≤ 100000
             total += dir.size
         end
     end

@@ -44,7 +44,7 @@ function day11(lines, part, rounds)
             while !isempty(monkey.items)
                 monkey.inspected += 1
                 item = popfirst!(monkey.items)
-                level = part === :part1 ? div(monkey.operation(item), 3) : rem(monkey.operation(item), common_multiple)
+                level = part == :part1 ? monkey.operation(item) ÷ 3 : monkey.operation(item) % common_multiple
                 target = rem(level, monkey.divisible) == 0 ? monkey.iftrue : monkey.iffalse
                 push!(monkeys[target+1].items, level)
             end

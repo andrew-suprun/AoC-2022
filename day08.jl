@@ -18,7 +18,7 @@ function day08(lines)
         count = 0
         for v in slice
             count += 1
-            if height <= v
+            if height ≤ v
                 break
             end
         end
