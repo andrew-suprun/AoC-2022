@@ -56,9 +56,7 @@ function day12(lines, part)
 
         current_level = next_level
         steps += 1
-        if target in visited
-            break
-        end
+        target in visited && break
     end
     return steps
 end
