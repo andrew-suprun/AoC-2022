@@ -3,29 +3,25 @@ function day12(lines, part)
     heightmap = Matrix{Int}(undef, nlines, nrows)
     start = (0, 0)
     target = (0, 0)
-    for l in eachindex(lines)
-        for r in eachindex(lines[l])
-            if lines[l][r] == 'S'
-                heightmap[l, r] = 0
-                start = (l, r)
-            elseif lines[l][r] == 'E'
-                heightmap[l, r] = 'z' - 'a'
-                target = (l, r)
-            else
-                heightmap[l, r] = lines[l][r] - 'a'
-            end
+    for l in eachindex(lines), r in eachindex(lines[l])
+        if lines[l][r] == 'S'
+            heightmap[l, r] = 0
+            start = (l, r)
+        elseif lines[l][r] == 'E'
+            heightmap[l, r] = 'z' - 'a'
+            target = (l, r)
+        else
+            heightmap[l, r] = lines[l][r] - 'a'
         end
     end
     visited = Set([start])
     current_level::Vector{Tuple{Int,Int}} = [start]
 
     if part == :part2
-        for l in eachindex(lines)
-            for r in eachindex(lines[l])
-                if lines[l][r] == 'a'
-                    push!(visited, (l, r))
-                    push!(current_level, (l, r))
-                end
+        for l in eachindex(lines), r in eachindex(lines[l])
+            if lines[l][r] == 'a'
+                push!(visited, (l, r))
+                push!(current_level, (l, r))
             end
         end
     end

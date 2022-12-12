@@ -39,15 +39,13 @@ function day11(lines, part, rounds)
 
     common_multiple = lcm(monkeys .|> m -> m.divisible)
 
-    for _ in 1:rounds
-        for monkey in monkeys
-            while !isempty(monkey.items)
-                monkey.inspected += 1
-                item = popfirst!(monkey.items)
-                level = part == :part1 ? monkey.operation(item) ÷ 3 : monkey.operation(item) % common_multiple
-                target = rem(level, monkey.divisible) == 0 ? monkey.iftrue : monkey.iffalse
-                push!(monkeys[target+1].items, level)
-            end
+    for _ in 1:rounds, monkey in monkeys
+        while !isempty(monkey.items)
+            monkey.inspected += 1
+            item = popfirst!(monkey.items)
+            level = part == :part1 ? monkey.operation(item) ÷ 3 : monkey.operation(item) % common_multiple
+            target = rem(level, monkey.divisible) == 0 ? monkey.iftrue : monkey.iffalse
+            push!(monkeys[target+1].items, level)
         end
     end
     inspected = monkeys .|> m -> m.inspected
