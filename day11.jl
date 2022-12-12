@@ -56,10 +56,11 @@ function day11(lines, part, rounds)
 end
 
 using BenchmarkTools
-println(@btime day11(readlines("day11.txt"), :part1, 20))
-println(@btime day11(readlines("day11.txt"), :part2, 10_000))
+lines = readlines("day11.txt")
+println(@btime day11(lines, :part1, 20))
+println(@btime day11(lines, :part2, 10_000))
 
-#   114.500 μs (542 allocations: 44.09 KiB)
+#   106.500 μs (424 allocations: 38.38 KiB)
 # 57838
-#   60.659 ms (3597332 allocations: 54.93 MiB)
+#   61.697 ms (3597214 allocations: 54.92 MiB)
 # 15050382231

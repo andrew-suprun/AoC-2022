@@ -64,10 +64,11 @@ function day12(lines, part)
 end
 
 using BenchmarkTools
-println(@btime day12(readlines("day12.txt"), :part1))
-println(@btime day12(readlines("day12.txt"), :part2))
+lines = readlines("day12.txt")
+println(@btime day12(lines, :part1))
+println(@btime day12(lines, :part2))
 
-#   438.500 μs (1279 allocations: 678.64 KiB)
+#   428.167 μs (1181 allocations: 669.47 KiB)
 # 472
-#   454.500 μs (1235 allocations: 739.33 KiB)
+#   444.125 μs (1137 allocations: 730.16 KiB)
 # 465
