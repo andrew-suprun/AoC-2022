@@ -40,7 +40,7 @@ function day11(lines, part, rounds)
     common_multiple = lcm(monkeys .|> m -> m.divisible)
 
     for _ in 1:rounds
-        for (i, monkey) in enumerate(monkeys)
+        for monkey in monkeys
             while !isempty(monkey.items)
                 monkey.inspected += 1
                 item = popfirst!(monkey.items)
