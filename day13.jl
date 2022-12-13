@@ -89,16 +89,10 @@ function day13b(lines)
     return prod(i for (i, tokens) in enumerate(token_lines) if tokens == tokens_two || tokens == tokens_six)
 end
 
+using BenchmarkTools
 lines = readlines("day13.txt")
-println(day13a(lines))
-println(day13b(lines))
-
-
-# using BenchmarkTools
-# lines = readlines("day13.txt")
-# println(@btime day13a(lines))
-# println(@btime day13b(lines))
-
+println(@btime day13a(lines))
+println(@btime day13b(lines))
 
 #   395.917 μs (7907 allocations: 754.98 KiB)
 # 5013
