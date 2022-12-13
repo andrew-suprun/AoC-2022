@@ -90,13 +90,7 @@ function day13b(lines)
     token_lines = map(tokenize, filter(l -> l != "", lines))
     push!(token_lines, tokens_two, tokens_six)
     sort!(token_lines, lt=isless)
-    result = 1
-    for (i, tokens) in enumerate(token_lines)
-        if tokens == tokens_two || tokens == tokens_six
-            result *= i
-        end
-    end
-    return result
+    return prod(i for (i, tokens) in enumerate(token_lines) if tokens == tokens_two || tokens == tokens_six)
 end
 
 using BenchmarkTools
