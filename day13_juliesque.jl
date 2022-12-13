@@ -11,8 +11,7 @@ function List(line::String)
     for (i, ch) in enumerate(line)
         if ch ≥ '0' && ch ≤ '9' && start_number == 0
             start_number = i
-        end
-        if (ch < '0' || ch > '9') && start_number > 0
+        elseif (ch < '0' || ch > '9') && start_number > 0
             push!(stack[end].items, parse(Int, line[start_number:i-1]))
             start_number = 0
         end
