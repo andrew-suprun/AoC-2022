@@ -1,20 +1,16 @@
 function tokenize(line)
     tokens = Vector{Union{Int,Symbol}}()
     start_number = 0
-    for i in eachindex(line)
-        ch = line[i]
-        if ch ≥ '0' && ch ≤ '9'
-            if start_number == 0
-                start_number = i
-            end
-        end
-        if (ch < '0' || ch > '9') && start_number > 0
+    for (i, ch) in enumerate(line)
+        if ch ≥ '0' && ch ≤ '9' && start_number == 0
+            start_number = i
+        elseif (ch < '0' || ch > '9') && start_number > 0
             push!(tokens, parse(Int, line[start_number:i-1]))
             start_number = 0
         end
-        if line[i] == '['
+        if ch == '['
             push!(tokens, :open)
-        elseif line[i] == ']'
+        elseif ch == ']'
             push!(tokens, :close)
         end
     end
@@ -73,7 +69,7 @@ function isless(left_source::Vector{Union{Int,Symbol}}, right_source::Vector{Uni
     return true
 end
 
-function day13a(lines)
+function day13a(lines) # TODO refactor
     sum = 0
     j = 0
     for i in 1:3:length(lines)
@@ -93,10 +89,16 @@ function day13b(lines)
     return prod(i for (i, tokens) in enumerate(token_lines) if tokens == tokens_two || tokens == tokens_six)
 end
 
-using BenchmarkTools
 lines = readlines("day13.txt")
-println(@btime day13a(lines))
-println(@btime day13b(lines))
+println(day13a(lines))
+println(day13b(lines))
+
+
+# using BenchmarkTools
+# lines = readlines("day13.txt")
+# println(@btime day13a(lines))
+# println(@btime day13b(lines))
+
 
 #   395.917 μs (7907 allocations: 754.98 KiB)
 # 5013
