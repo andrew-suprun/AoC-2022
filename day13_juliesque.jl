@@ -39,15 +39,15 @@ end
 Base.:(==)(l::List, r::Int) = l == List(r)
 Base.:(==)(l::Int, r::List) = List(l) == r
 
-function Base.isless(left::List, right::List)
+function Base.:(<)(left::List, right::List)
     for (l, r) in zip(left.items, right.items)
         l < r && return true
         l > r && return false
     end
     return length(left.items) < length(right.items)
 end
-Base.isless(l::List, r::Int) = l < List(r)
-Base.isless(l::Int, r::List) = List(l) < r
+Base.:(<)(l::List, r::Int) = l < List(r)
+Base.:(<)(l::Int, r::List) = List(l) < r
 
 day13a(lines) = sum(i for i in 1:(length(lines)+1)÷3 if List(lines[3i-2]) < List(lines[3i-1]))
 
@@ -55,7 +55,7 @@ function day13b(lines)
     lists = map(List, filter(l -> l != "", lines))
     list2, list6 = List("[[2]]"), List("[[6]]")
     push!(lists, list2, list6)
-    sort!(lists)
+    sort!(lists, lt=<)
     return prod(i for (i, list) in enumerate(lists) if list == list2 || list == list6)
 end
 
