@@ -9,24 +9,12 @@ function day14(part, lines)
         line_parts = parse.(Int, filter(x -> x != "->", split(line, [',', ' '])))
         for t in 1:2:length(line_parts)-3
             x1, y1, x2, y2 = line_parts[t:t+3]
-            if x1 > x2
-                x1, x2 = x2, x1
-            end
-            if y1 > y2
-                y1, y2 = y2, y1
-            end
-            if xmin > x1
-                xmin = x1
-            end
-            if xmax < x2
-                xmax = x2
-            end
-            if ymin > y1
-                ymin = y1
-            end
-            if ymax < y2
-                ymax = y2
-            end
+            x1, x2 = min(x1, x2), max(x1, x2)
+            y1, y2 = min(y1, y2), max(y1, y2)
+            xmin = min(xmin, x1)
+            xmax = max(xmax, x2)
+            ymin = min(ymin, y1)
+            ymax = max(ymax, y2)
             for x in x1:x2, y in y1:y2
                 push!(grid, (x, y))
             end
