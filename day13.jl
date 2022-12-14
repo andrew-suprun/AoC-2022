@@ -58,12 +58,6 @@ function day13b(lines)
     return prod(i for (i, list) in enumerate(lists) if list == list2 || list == list6)
 end
 
-using BenchmarkTools
 lines = readlines("day13.txt")
-println(@btime day13a(lines))
-println(@btime day13b(lines))
-
-#   473.625 μs (18530 allocations: 704.70 KiB)
-# 5013
-#   718.125 μs (26097 allocations: 1014.45 KiB)
-# 25038
+println(day13a(lines)) # 5013
+println(day13b(lines)) # 25038

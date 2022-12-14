@@ -1,4 +1,6 @@
-function day12(lines, part)
+function start_positins end
+
+function day12(part, lines)
     nlines, nrows = length(lines), length(lines[1])
     heightmap = Matrix{Int}(undef, nlines, nrows)
     start = (0, 0)
@@ -14,17 +16,11 @@ function day12(lines, part)
             heightmap[l, r] = lines[l][r] - 'a'
         end
     end
-    visited = Set([start])
-    current_level::Vector{Tuple{Int,Int}} = [start]
 
-    if part == :part2
-        for l in eachindex(lines), r in eachindex(lines[l])
-            if lines[l][r] == 'a'
-                push!(visited, (l, r))
-                push!(current_level, (l, r))
-            end
-        end
-    end
+    visited, current_level = start_positins(part, lines)
+
+    push!(visited, start)
+    push!(current_level, start)
 
     steps = 0
     while true
@@ -57,12 +53,20 @@ function day12(lines, part)
     return steps
 end
 
-using BenchmarkTools
-lines = readlines("day12.txt")
-println(@btime day12(lines, :part1))
-println(@btime day12(lines, :part2))
+start_positins(::Val{:part1}, lines) = Set(Tuple{Int,Int}[]), Tuple{Int,Int}[]
 
-#   428.167 μs (1181 allocations: 669.47 KiB)
-# 472
-#   444.125 μs (1137 allocations: 730.16 KiB)
-# 465
+function start_positins(::Val{:part2}, lines)
+    visited = Set(Tuple{Int,Int}[])
+    current_level = Tuple{Int,Int}[]
+    for l in eachindex(lines), r in eachindex(lines[l])
+        if lines[l][r] == 'a'
+            push!(visited, (l, r))
+            push!(current_level, (l, r))
+        end
+    end
+    return visited, current_level
+end
+
+lines = readlines("day12.txt")
+println(day12(Val(:part1), lines)) # 472
+println(day12(Val(:part2), lines)) # 465

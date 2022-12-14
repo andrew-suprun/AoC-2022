@@ -8,7 +8,10 @@ mutable struct Monkey
     Monkey() = new([], () -> nothing, 0, 0, 0, 0)
 end
 
-function day11(lines, part, rounds)
+update_level(::Val{:part1}, level, common_multiple) = level ÷ 3
+update_level(::Val{:part2}, level, common_multiple) = level % common_multiple
+
+function day11(part, lines, rounds)
     monkeys = Vector{Monkey}()
     monkey = Monkey()
     lines = strip.(lines)
@@ -43,7 +46,7 @@ function day11(lines, part, rounds)
         while !isempty(monkey.items)
             monkey.inspected += 1
             item = popfirst!(monkey.items)
-            level = part == :part1 ? monkey.operation(item) ÷ 3 : monkey.operation(item) % common_multiple
+            level = update_level(part, monkey.operation(item), common_multiple)
             target = rem(level, monkey.divisible) == 0 ? monkey.iftrue : monkey.iffalse
             push!(monkeys[target+1].items, level)
         end
@@ -53,12 +56,6 @@ function day11(lines, part, rounds)
     return inspected[1] * inspected[2]
 end
 
-using BenchmarkTools
 lines = readlines("day11.txt")
-println(@btime day11(lines, :part1, 20))
-println(@btime day11(lines, :part2, 10_000))
-
-#   106.500 μs (424 allocations: 38.38 KiB)
-# 57838
-#   61.697 ms (3597214 allocations: 54.92 MiB)
-# 15050382231
+println(day11(Val(:part1), lines, 20))     # 57838
+println(day11(Val(:part2), lines, 10_000)) # 15050382231
