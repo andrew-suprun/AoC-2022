@@ -8,10 +8,7 @@ function day14(part, lines)
     for line in lines
         line_parts = parse.(Int, filter(x -> x != "->", split(line, [',', ' '])))
         for t in 1:2:length(line_parts)-3
-            x1 = line_parts[t]
-            x2 = line_parts[t+2]
-            y1 = line_parts[t+1]
-            y2 = line_parts[t+3]
+            x1, y1, x2, y2 = line_parts[t:t+3]
             if x1 > x2
                 x1, x2 = x2, x1
             end
