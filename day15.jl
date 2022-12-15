@@ -35,9 +35,7 @@ end
 
 Base.length(r::Ranges) = sum(length.(r.ranges))
 
-function day15part end
-
-function day15(part, lines, line, size)
+function read_input(lines)
     sensors = Sensor[]
     for line in lines
         parts = split(split(line, "Sensor at x=")[2], ": closest beacon is at x=")
@@ -46,7 +44,7 @@ function day15(part, lines, line, size)
         push!(sensors, Sensor(sensor, beacon))
     end
 
-    return day15part(part, sensors, line, size)
+    return sensors
 end
 
 function cover(sensors, y)
@@ -58,15 +56,17 @@ function cover(sensors, y)
     return covered
 end
 
-function day15part(::Val{:part1}, sensors, line, _size)
+function day15a(lines, nline)
+    sensors = read_input(lines)
     inline_beacons = Set(Position[])
     for sensor in sensors
-        sensor.beacon.y == line && push!(inline_beacons, sensor.beacon)
+        sensor.beacon.y == nline && push!(inline_beacons, sensor.beacon)
     end
-    return length(cover(sensors, line)) - length(inline_beacons)
+    return length(cover(sensors, nline)) - length(inline_beacons)
 end
 
-function day15part(::Val{:part2}, sensors, _line, size)
+function day15b(lines, size)
+    sensors = read_input(lines)
     for y in 0:size
         covered = cover(sensors, y)
         if length(covered.ranges) == 2
@@ -81,5 +81,5 @@ function day15part(::Val{:part2}, sensors, _line, size)
 end
 
 lines = readlines("day15.txt")
-println(day15(Val(:part1), lines, 2_000_000, 4_000_000)) #        5181556  (25.166 μs)
-println(day15(Val(:part2), lines, 2_000_000, 4_000_000)) # 12817603219131 (364.338 ms)
+println(day15a(lines, 2_000_000)) #        5181556  (25.166 μs)
+println(day15b(lines, 4_000_000)) # 12817603219131 (364.338 ms)
