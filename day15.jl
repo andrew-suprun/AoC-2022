@@ -52,15 +52,20 @@ function day15(part, lines, line, size)
     return day15part(part, sensors, line, size)
 end
 
-function day15part(::Val{:part1}, sensors, line, _size)
+function cover(sensors, y)
     covered = Ranges()
     for sensor in sensors
         beacon_dustance = distance(sensor.sensor, sensor.beacon)
-        diff = beacon_dustance - abs(sensor.sensor.y - line)
+        diff = beacon_dustance - abs(sensor.sensor.y - y)
         if diff ≥ 0
             push!(covered, sensor.sensor.x-diff:sensor.sensor.x+diff)
         end
     end
+    return covered
+end
+
+function day15part(::Val{:part1}, sensors, line, _size)
+    covered = cover(sensors, line)
     ncovered = length(covered)
     inline_beacons = Set(Position[])
     for sensor in sensors
@@ -74,14 +79,7 @@ end
 
 function day15part(::Val{:part2}, sensors, _line, size)
     for y in 0:size
-        covered = Ranges()
-        for sensor in sensors
-            beacon_dustance = distance(sensor.sensor, sensor.beacon)
-            diff = beacon_dustance - abs(sensor.sensor.y - y)
-            if diff ≥ 0
-                push!(covered, sensor.sensor.x-diff:sensor.sensor.x+diff)
-            end
-        end
+        covered = cover(sensors, y)
         if length(covered.ranges) == 2
             if covered.ranges[1].start == covered.ranges[2].stop + 2
                 return (covered.ranges[1].start - 1) * size + y
