@@ -52,21 +52,18 @@ end
 function cover(sensors, y)
     covered = Ranges()
     for sensor in sensors
-        beacon_dustance = distance(sensor.sensor, sensor.beacon)
-        diff = beacon_dustance - abs(sensor.sensor.y - y)
+        diff = distance(sensor.sensor, sensor.beacon) - abs(sensor.sensor.y - y)
         diff ≥ 0 && push!(covered, sensor.sensor.x-diff:sensor.sensor.x+diff)
     end
     return covered
 end
 
 function day15part(::Val{:part1}, sensors, line, _size)
-    ncovered = length(cover(sensors, line))
     inline_beacons = Set(Position[])
     for sensor in sensors
         sensor.beacon.y == line && push!(inline_beacons, sensor.beacon)
     end
-    ncovered -= length(inline_beacons)
-    return ncovered
+    return length(cover(sensors, line)) - length(inline_beacons)
 end
 
 function day15part(::Val{:part2}, sensors, _line, size)
