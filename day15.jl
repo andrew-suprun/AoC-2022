@@ -65,8 +65,7 @@ function cover(sensors, y)
 end
 
 function day15part(::Val{:part1}, sensors, line, _size)
-    covered = cover(sensors, line)
-    ncovered = length(covered)
+    ncovered = length(cover(sensors, line))
     inline_beacons = Set(Position[])
     for sensor in sensors
         if sensor.beacon.y == line
