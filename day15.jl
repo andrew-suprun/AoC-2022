@@ -40,13 +40,10 @@ function day15part end
 function day15(part, lines, line, size)
     sensors = Sensor[]
     for line in lines
-        parts = split(line, "Sensor at x=")
-        parts = split(parts[2], ": closest beacon is at x=")
-        sensor = split(parts[1], ", y=")
-        beacon = split(parts[2], ", y=")
-        sensorx, sensory = parse.(Int, sensor)
-        beaconx, beacony = parse.(Int, beacon)
-        push!(sensors, Sensor(Position(sensorx, sensory), Position(beaconx, beacony)))
+        parts = split(split(line, "Sensor at x=")[2], ": closest beacon is at x=")
+        sensor = Position(parse.(Int, split(parts[1], ", y="))...)
+        beacon = Position(parse.(Int, split(parts[2], ", y="))...)
+        push!(sensors, Sensor(sensor, beacon))
     end
 
     return day15part(part, sensors, line, size)
@@ -57,9 +54,7 @@ function cover(sensors, y)
     for sensor in sensors
         beacon_dustance = distance(sensor.sensor, sensor.beacon)
         diff = beacon_dustance - abs(sensor.sensor.y - y)
-        if diff ≥ 0
-            push!(covered, sensor.sensor.x-diff:sensor.sensor.x+diff)
-        end
+        diff ≥ 0 && push!(covered, sensor.sensor.x-diff:sensor.sensor.x+diff)
     end
     return covered
 end
@@ -68,9 +63,7 @@ function day15part(::Val{:part1}, sensors, line, _size)
     ncovered = length(cover(sensors, line))
     inline_beacons = Set(Position[])
     for sensor in sensors
-        if sensor.beacon.y == line
-            push!(inline_beacons, sensor.beacon)
-        end
+        sensor.beacon.y == line && push!(inline_beacons, sensor.beacon)
     end
     ncovered -= length(inline_beacons)
     return ncovered
