@@ -76,7 +76,6 @@ function day15b(lines, size)
             return (covered.ranges[1].stop + 1) * size + y
         end
     end
-    return 0
 end
 
 lines = readlines("day15.txt")
