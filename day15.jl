@@ -38,10 +38,9 @@ Base.length(r::Ranges) = sum(length.(r.ranges))
 function read_input(lines)
     sensors = Sensor[]
     for line in lines
-        parts = split(split(line, "Sensor at x=")[2], ": closest beacon is at x=")
-        sensor = Position(parse.(Int, split(parts[1], ", y="))...)
-        beacon = Position(parse.(Int, split(parts[2], ", y="))...)
-        push!(sensors, Sensor(sensor, beacon))
+        line = replace(line, "Sensor at x=" => "", ": closest beacon is at x=" => ",", ", y=" => ",")
+        sx, sy, bx, by = parse.(Int, split(line, ","))
+        push!(sensors, Sensor(Position(sx, sy), Position(bx, by)))
     end
 
     return sensors
