@@ -70,11 +70,10 @@ function day15b(lines, size)
     for y in 0:size
         covered = cover(sensors, y)
         if length(covered.ranges) == 2
-            if covered.ranges[1].start == covered.ranges[2].stop + 2
-                return (covered.ranges[1].start - 1) * size + y
-            elseif covered.ranges[2].start == covered.ranges[2].stop + 2
-                return (covered.ranges[2].start - 1) * size + y
+            if covered.ranges[1].start > covered.ranges[2].start
+                covered.ranges[1], covered.ranges[2] = covered.ranges[2], covered.ranges[1]
             end
+            return (covered.ranges[1].stop + 1) * size + y
         end
     end
     return 0
