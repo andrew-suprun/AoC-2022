@@ -2,7 +2,7 @@ const vacuum = 0
 const air = 1
 const lava = 2
 
-function dimentions(cubes)
+function dimensions(cubes)
     xmax = ymax = zmax = typemin(Int)
     for (x, y, z) in cubes
         xmax < x && (xmax = x)
@@ -42,7 +42,7 @@ end
 
 function day18(lines, part)
     cubes = split.(lines, ',') .|> x -> parse.(Int, x)
-    xmax, ymax, zmax = dimentions(cubes)
+    xmax, ymax, zmax = dimensions(cubes)
     scanner = fill(air, xmax + 3, ymax + 3, zmax + 3)
     vacuum_inner_space(scanner, part)
     for cube in cubes
