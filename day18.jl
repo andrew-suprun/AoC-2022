@@ -23,7 +23,7 @@ end
 
 function inflate(scanner, ::Val{:part2})
     while true
-        added_air = 0
+        added_air = false
         for z in 2:size(scanner, 3)-1, y in 2:size(scanner, 2)-1, x in 2:size(scanner, 1)-1
             if scanner[x, y, z] == vacuum && (
                 scanner[x-1, y, z] == air ||
@@ -33,10 +33,10 @@ function inflate(scanner, ::Val{:part2})
                 scanner[x, y, z-1] == air ||
                 scanner[x, y, z+1] == air)
                 scanner[x, y, z] = air
-                added_air += 1
+                added_air = true
             end
         end
-        added_air == 0 && break
+        added_air || break
     end
 end
 
