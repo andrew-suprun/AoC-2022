@@ -79,5 +79,5 @@ function day16(lines, actor1, actor2)
 end
 
 lines = readlines("day16.txt")
-println("Part 1:$(day16(lines, Actor("AA", 30), nothing))")         # 1880
-println("Part 2:$(day16(lines, Actor("AA", 26), Actor("AA", 26)))") # 2520
+# println("Part 1:$(day16(lines, Actor("AA", 30), nothing))")         # 1880
+# println("Part 2:$(day16(lines, Actor("AA", 26), Actor("AA", 26)))") # 2520
