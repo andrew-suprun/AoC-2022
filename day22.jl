@@ -29,214 +29,138 @@ struct Board
     end
 end
 
-Base.getindex(board::Board, position::Tuple{Int,Int})::Char =
-    if 0 ≤ position[1] < length(board.lines) && 0 ≤ position[2] < length(board.lines[position[1]+1])
-        board.lines[position[1]+1][position[2]+1]
+struct Position
+    row::Int
+    col::Int
+end
+
+const east = 0
+const south = 1
+const west = 2
+const north = 3
+
+Base.getindex(board::Board, pos::Position)::Char =
+    if 0 ≤ pos.row < length(board.lines) && 0 ≤ pos.col < length(board.lines[pos.row+1])
+        board.lines[pos.row+1][pos.col+1]
     else
         ' '
     end
 
-struct Cursor
-    position::Tuple{Int,Int}
-    direction::Tuple{Int,Int}
-end
+score(pos::Position, dir::Int) = (pos.row + 1) * 1000 + (pos.col + 1) * 4 + dir
 
-score(cursor::Cursor) = (cursor.position[1] + 1) * 1000 + (cursor.position[2] + 1) * 4 + direction(cursor)
+turn_right(dir::Int) = (dir + 1) % 4
+turn_left(dir::Int) = (dir + 3) % 4
 
-turn_right(direction::Tuple{Int,Int}) =
-    if direction == (0, 1)
-        (1, 0)
-    elseif direction == (0, -1)
-        (-1, 0)
-    elseif direction == (1, 0)
-        (0, -1)
+step(pos::Position, dir::Int)::Position =
+    if dir == east
+        Position(pos.row, pos.col + 1)
+    elseif dir == south
+        Position(pos.row + 1, pos.col)
+    elseif dir == west
+        Position(pos.row, pos.col - 1)
     else
-        (0, 1)
+        Position(pos.row - 1, pos.col)
     end
 
-turn_left(direction::Tuple{Int,Int}) =
-    if direction == (0, 1)
-        (-1, 0)
-    elseif direction == (0, -1)
-        (1, 0)
-    elseif direction == (1, 0)
-        (0, 1)
-    else
-        (0, -1)
-    end
+function peek(board::Board, pos::Position, dir::Int, ::Val{:part1})::Tuple{Char,Position,Int}
+    next_pos = step(pos, dir)
 
-function peek(board::Board, cursor::Cursor, ::Val{:part1})::Tuple{Char,Cursor}
-    next_position = cursor.position .+ cursor.direction
-
-    if board[next_position] == ' '
-        if cursor.direction == (0, 1)
-            next_position = (next_position[1], 0)
-        elseif cursor.direction == (0, -1)
-            next_position = (next_position[1], 4board.side)
-        elseif cursor.direction == (1, 0)
-            next_position = (0, next_position[2])
-        elseif cursor.direction == (-1, 0)
-            next_position = (4board.side, next_position[2])
+    if board[next_pos] == ' '
+        if dir == east
+            next_pos = Position(next_pos.row, 0)
+        elseif dir == west
+            next_pos = Position(next_pos.row, 4board.side)
+        elseif dir == south
+            next_pos = Position(0, next_pos.col)
+        elseif dir == north
+            next_pos = Position(4board.side, next_pos.col)
         end
-        while board[next_position] == ' '
-            next_position = next_position .+ cursor.direction
+        while board[next_pos] == ' '
+            next_pos = step(next_pos, dir)
         end
     end
-    return board[next_position], Cursor(next_position, cursor.direction)
+    return board[next_pos], next_pos, dir
 end
 
-function skip_empty_space(board::Board, cursor::Cursor)
-    while board[cursor.position] == ' '
-        cursor = Cursor(cursor.position .+ cursor.direction, cursor.direction)
+function skip_empty_space(board::Board, pos::Position, dir::Int)::Position
+    while board[pos] == ' '
+        pos = step(pos, dir)
     end
-    return cursor
+    return pos
 end
 
-function peek(board::Board, cursor::Cursor, ::Val{:part2})::Tuple{Char,Cursor}
-    next_position = cursor.position .+ cursor.direction
-    @show next_position, cursor.direction
-    if board[next_position] != ' '
-        return board[next_position], Cursor(next_position, cursor.direction)
+function peek(board::Board, pos::Position, dir::Int, ::Val{:part2})::Tuple{Char,Cursor}
+    next_pos = cursor.pos .+ cursor.dir
+    if board[next_pos] != ' '
+        return board[next_pos], Cursor(next_pos, cursor.dir)
     end
 
-    @show inner_position = next_position .% board.side
-    @show right_position = inner_position[2], board.side - inner_position[1] - 1
-    @show left_position = board.side - inner_position[2] - 1, inner_position[1]
-    @show reverse_position = board.side - inner_position[1] - 1, board.side - inner_position[2] - 1
-    base = next_position .÷ board.side .* board.side
+    base = (next_pos .+ board.side) .÷ board.side .* board.side .- board.side
+    inner_pos = next_pos .- base
+    inner_poss = [
+        inner_pos,
+        (inner_pos.col, board.side - inner_pos.row - 1),
+        (board.side - inner_pos.col - 1, inner_pos.row),
+        (board.side - inner_pos.row - 1, board.side - inner_pos.col - 1),
+    ]
 
-    switch_right = base .+ right_position .+ turn_right(cursor.direction) .* board.side
-    @show switch_right, board[switch_right]
-    if board[switch_right] != ' '
-        return board[switch_right], Cursor(switch_right, turn_right(cursor.direction))
+    right_shift = turn_right(cursor.dir) .* board.side
+    forward_shift = cursor.dir .* board.side
+
+    for switch in switches
+        new_pos = base .+ switch.right_turn .* right_shift .+ switch.forward .* forward_shift .+ inner_poss[switch.pos]
+        if board[new_pos] != ' '
+            println("switch=$switch")
+            println("    current   $next_pos, $(cursor.dir)")
+            println("    base      $base")
+            println("    inner     $inner_pos")
+            println("    rotated   $(inner_poss[switch.pos])")
+            println("    rightward $(switch.right_turn .* right_shift)")
+            println("    forward   $(switch.forward .* forward_shift)")
+            println("    next      $new_pos $(switch.dir(cursor.dir)): '$(board[new_pos])'")
+
+            return board[new_pos], Cursor(new_pos, switch.dir(cursor.dir))
+        end
     end
-
-    switch_right2 = base .+ right_position .- turn_right(cursor.direction) .* 2board.side .- cursor.direction .* 3board.side
-    @show switch_right2, board[switch_right2]
-    if board[switch_right2] != ' '
-        return board[switch_right2], Cursor(switch_right2, turn_right(cursor.direction))
-    end
-
-    switch_left = turn_left(cursor.direction) .* board.side .+ base .+ left_position
-    @show switch_left, board[switch_left]
-    if board[switch_left] != ' '
-        return board[switch_left], Cursor(switch_left, turn_left(cursor.direction))
-    end
-
-    switch_left2 = base .+ left_position .- turn_left(cursor.direction) .* 2board.side .- cursor.direction .* 3board.side
-    @show switch_left2, board[switch_left2]
-    if board[switch_left2] != ' '
-        return board[switch_left2], Cursor(switch_left2, turn_left(cursor.direction))
-    end
-
-    switch_left3 = base .+ left_position .- turn_left(cursor.direction) .* 3board.side .- cursor.direction .* board.side
-    @show switch_left3, board[switch_left3]
-    if board[switch_left3] != ' '
-        return board[switch_left3], Cursor(switch_left3, turn_left(cursor.direction))
-    end
-
-    reverse_left = base .+ reverse_position .- turn_left(cursor.direction) .* 2board.side .- cursor.direction .* 2board.side
-    @show reverse_left, board[reverse_left]
-    if board[reverse_left] != ' '
-        return board[reverse_left], Cursor(reverse_left, (0, 0) .- cursor.direction)
-    end
-
-    reverse_left2 = base .+ reverse_position .+ turn_left(cursor.direction) .* 3board.side
-    @show reverse_left2, board[reverse_left2]
-    if board[reverse_left2] != ' '
-        return board[reverse_left2], Cursor(reverse_left2, (0, 0) .- cursor.direction)
-    end
-
-    reverse_left3 = base .+ reverse_position .+ turn_left(cursor.direction) .* 2board.side
-    @show reverse_left3, board[reverse_left3]
-    if board[reverse_left3] != ' '
-        return board[reverse_left3], Cursor(reverse_left3, (0, 0) .- cursor.direction)
-    end
-
-    straight_left = base .+ inner_position .- turn_left(cursor.direction) .* 2board.side .- cursor.direction .* 4board.side
-    @show straight_left, board[straight_left]
-    if board[straight_left] != ' '
-        return board[straight_left], Cursor(straight_left, cursor.direction)
-    end
-
-    reverse_right = base .+ reverse_position .- turn_right(cursor.direction) .* 2board.side .- cursor.direction .* 2board.side
-    @show reverse_right, board[reverse_right]
-    if board[reverse_right] != ' '
-        return board[reverse_right], Cursor(reverse_right, (0, 0) .- cursor.direction)
-    end
-
-    reverse_right2 = base .+ reverse_position .+ turn_left(cursor.direction) .* 3board.side
-    @show reverse_right2, board[reverse_right2]
-    if board[reverse_right2] != ' '
-        return board[reverse_right2], Cursor(reverse_right2, (0, 0) .- cursor.direction)
-    end
-
-    reverse_right3 = base .+ reverse_position .+ turn_right(cursor.direction) .* 2board.side
-    @show reverse_right3, board[reverse_right3]
-    if board[reverse_right3] != ' '
-        return board[reverse_right3], Cursor(reverse_right3, (0, 0) .- cursor.direction)
-    end
-
-    straight_right = base .+ inner_position .- turn_right(cursor.direction) .* 2board.side .- cursor.direction .* 4board.side
-    @show straight_right, board[straight_right]
-    if board[straight_right] != ' '
-        return board[straight_right], Cursor(straight_right, (0, 0) .- cursor.direction)
-    end
-
 
     throw("Implement me!")
 end
 
-function move(board::Board, cursor::Cursor, steps::Int, part)::Cursor
+function move(board::Board, pos::Position, dir::Int, steps::Int, part)::Tuple{Position,Int}
     for _ in 1:steps
-        char, next_cursor = peek(board, cursor, part)
+        char, next_pos, next_dir = peek(board, pos, dir, part)
         if char == '#'
-            return cursor
+            return pos, dir
         end
-        cursor = next_cursor
+        pos, dir = next_pos, next_dir
     end
-    return cursor
+    return pos, dir
 end
 
-
-direction(cursor::Cursor) =
-    if cursor.direction == (0, 1)
-        0
-    elseif cursor.direction == (1, 0)
-        1
-    elseif cursor.direction == (0, -1)
-        2
-    else
-        3
-    end
-
-function day22(board::Board, cursor::Cursor, cmds::Commands, part)
-    @show cursor
+function day22(board::Board, pos::Position, dir::Int, cmds::Commands, part)
     for cmd in cmds
-        @show cmd
         if cmd == 'R'
-            cursor = Cursor(cursor.position, turn_right(cursor.direction))
+            dir = turn_right(dir)
         elseif cmd == 'L'
-            cursor = Cursor(cursor.position, turn_left(cursor.direction))
+            dir = turn_left(dir)
         else
-            cursor = move(board, cursor, cmd, part)
+            pos, dir = move(board, pos, dir, cmd, part)
         end
-        @show cursor
     end
-    return score(cursor)
+    return score(pos, dir)
 end
 
 function get_input(lines)
     cmds = Commands(lines[end])
     lines = lines[1:end-2]
     board = Board(lines)
-    cursor = skip_empty_space(board, Cursor((0, 0), (0, 1)))
-    return board, cursor, cmds
+    pos = skip_empty_space(board, Position(0, 0), east)
+    return board, pos, east, cmds
 end
 
-board, cursor, cmds = get_input(readlines("day22.txt"))
-# println("Part 1: $(day22(board, cursor, cmds, Val(:part1)))") # 73346
-println("Part 2: $(day22(board, cursor, cmds, Val(:part2)))") # < 153072
+board, pos, dir, cmds = get_input(readlines("day22.txt"))
+println("Part 1: $(day22(board, pos, dir, cmds, Val(:part1)))") # 73346
+# println("Part 2: $(day22(board, pos, dir, cmds, Val(:part2)))") # < 147330, > 59349
 
 
 # 10 R 5 L 5 R 10 L 4 R 5 L 5
