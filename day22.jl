@@ -1,6 +1,41 @@
-mutable struct Commands
+struct Commands
     line::String
 end
+
+struct Board
+    lines::Vector{String}
+    side::Int
+    function Board(lines::Vector{String})
+        size = length(lines), maximum(length(line) for line in lines)
+        new(lines, minimum(size) ÷ 3)
+    end
+end
+
+struct Direction
+    to::Int
+end
+
+struct Position
+    row::Int
+    col::Int
+end
+
+struct Link
+    pos::Position
+    dir::Direction
+end
+
+mutable struct Links
+    links::Vector{Union{Link,Nothing}}
+end
+
+const Cube = Dict{Position,Links}
+
+const east = Direction(1)
+const south = Direction(2)
+const west = Direction(3)
+const north = Direction(4)
+const directions = [east, south, west, north]
 
 function Base.iterate(iter::Commands, state=1)
     state > length(iter.line) && return nothing
@@ -20,24 +55,23 @@ function Base.iterate(iter::Commands, state=1)
     end
 end
 
-struct Board
-    lines::Vector{String}
-    side::Int
-    function Board(lines::Vector{String})
-        size = length(lines), maximum(length(line) for line in lines)
-        new(lines, minimum(size) ÷ 3)
+Base.:(+)(pos1::Position, pos2::Position) = Position(pos1.row + pos2.row, pos1.col + pos2.col)
+Base.:(-)(pos1::Position, pos2::Position) = Position(pos1.row - pos2.row, pos1.col - pos2.col)
+Base.:(+)(pos::Position, i::Int) = Position(pos.row + i, pos.col + i)
+Base.:(-)(pos::Position, i::Int) = Position(pos.row - i, pos.col - i)
+Base.:(*)(pos::Position, i::Int) = Position(pos.row * i, pos.col * i)
+Base.:(÷)(pos::Position, i::Int) = Position(pos.row ÷ i, pos.col ÷ i)
+
+turn_right(dir::Direction) = Direction((dir.to + 4) % 4 + 1)
+turn_left(dir::Direction) = Direction((dir.to + 2) % 4 + 1)
+Base.:(-)(dir1::Direction, dir2::Direction) = (dir1.to - dir2.to + 4) % 4
+
+function turn(dir::Direction, diff::Int)
+    for _ in 1:diff
+        dir = turn_right(dir)
     end
+    return dir
 end
-
-struct Position
-    row::Int
-    col::Int
-end
-
-const east = 0
-const south = 1
-const west = 2
-const north = 3
 
 Base.getindex(board::Board, pos::Position)::Char =
     if 0 ≤ pos.row < length(board.lines) && 0 ≤ pos.col < length(board.lines[pos.row+1])
@@ -46,89 +80,110 @@ Base.getindex(board::Board, pos::Position)::Char =
         ' '
     end
 
-score(pos::Position, dir::Int) = (pos.row + 1) * 1000 + (pos.col + 1) * 4 + dir
+isface(board::Board, pos::Position) = board[pos] != ' '
 
-turn_right(dir::Int) = (dir + 1) % 4
-turn_left(dir::Int) = (dir + 3) % 4
+function init_cube(board::Board)
+    cube = Dict{Position,Links}()
+    for row in 0:board.side:3board.side, col in 0:board.side:3board.side
+        pos = Position(row, col)
+        if isface(board, pos)
+            cube[pos] = Links([nothing, nothing, nothing, nothing])
+        end
+    end
+    return cube
+end
 
-step(pos::Position, dir::Int)::Position =
+function cube_part1(board::Board)
+    cube = init_cube(board)
+    for (pos_from, links_from) in cube
+        for dir in directions
+            pos_to = step(pos_from, dir, board.side)
+            if isface(board, pos_to)
+                links_from.links[dir.to] = Link(pos_to, dir)
+            else
+                for i in -3:0
+                    pos_to = step(pos_from, dir, i * board.side)
+                    if isface(board, pos_to)
+                        links_from.links[dir.to] = Link(pos_to, dir)
+                        break
+                    end
+                end
+            end
+        end
+    end
+    return cube
+end
+
+function cube_part2(board::Board)
+    cube = init_cube(board)
+    for (pos_from, links_from) in cube
+        for dir in directions
+            pos_to = step(pos_from, dir, board.side)
+            if isface(board, pos_to)
+                links_from.links[dir.to] = Link(pos_to, dir)
+            end
+        end
+    end
+    while true
+        has_changes = false
+        for (pos, links) in cube
+            for dir1 in directions
+                dir2 = turn_right(dir1)
+                link1 = links.links[dir1.to]
+                link2 = links.links[dir2.to]
+                if link1 !== nothing && link2 !== nothing
+                    pos1_links = cube[link1.pos]
+                    pos2_links = cube[link2.pos]
+                    if pos1_links.links[turn_right(link1.dir).to] === nothing
+                        has_changes = true
+                        pos1_links.links[turn_right(link1.dir).to] = Link(link2.pos, turn(turn_right(dir2), link2.dir - dir2))
+                        pos2_links.links[turn_left(link2.dir).to] = Link(link1.pos, turn(turn_left(dir1), link1.dir - dir1))
+                    end
+                end
+            end
+        end
+        if !has_changes
+            break
+        end
+    end
+    return cube
+end
+
+score(pos::Position, dir::Direction) = (pos.row + 1) * 1000 + (pos.col + 1) * 4 + dir.to - 1
+
+step(pos::Position, dir::Direction, size::Int=1)::Position =
     if dir == east
-        Position(pos.row, pos.col + 1)
+        Position(pos.row, pos.col + size)
     elseif dir == south
-        Position(pos.row + 1, pos.col)
+        Position(pos.row + size, pos.col)
     elseif dir == west
-        Position(pos.row, pos.col - 1)
+        Position(pos.row, pos.col - size)
+    elseif dir == north
+        Position(pos.row - size, pos.col)
     else
-        Position(pos.row - 1, pos.col)
+        throw("BAD Direction")
     end
 
-function peek(board::Board, pos::Position, dir::Int, ::Val{:part1})::Tuple{Char,Position,Int}
+function peek(board::Board, pos::Position, dir::Direction, cube::Cube)::Tuple{Char,Position,Direction}
     next_pos = step(pos, dir)
-
-    if board[next_pos] == ' '
-        if dir == east
-            next_pos = Position(next_pos.row, 0)
-        elseif dir == west
-            next_pos = Position(next_pos.row, 4board.side)
-        elseif dir == south
-            next_pos = Position(0, next_pos.col)
-        elseif dir == north
-            next_pos = Position(4board.side, next_pos.col)
-        end
-        while board[next_pos] == ' '
-            next_pos = step(next_pos, dir)
-        end
-    end
-    return board[next_pos], next_pos, dir
-end
-
-function skip_empty_space(board::Board, pos::Position, dir::Int)::Position
-    while board[pos] == ' '
-        pos = step(pos, dir)
-    end
-    return pos
-end
-
-function peek(board::Board, pos::Position, dir::Int, ::Val{:part2})::Tuple{Char,Cursor}
-    next_pos = cursor.pos .+ cursor.dir
     if board[next_pos] != ' '
-        return board[next_pos], Cursor(next_pos, cursor.dir)
+        return board[next_pos], next_pos, dir
     end
 
-    base = (next_pos .+ board.side) .÷ board.side .* board.side .- board.side
-    inner_pos = next_pos .- base
-    inner_poss = [
-        inner_pos,
-        (inner_pos.col, board.side - inner_pos.row - 1),
-        (board.side - inner_pos.col - 1, inner_pos.row),
-        (board.side - inner_pos.row - 1, board.side - inner_pos.col - 1),
-    ]
+    base = (pos + board.side) ÷ board.side * board.side - board.side
+    link = cube[base].links[dir.to]
 
-    right_shift = turn_right(cursor.dir) .* board.side
-    forward_shift = cursor.dir .* board.side
-
-    for switch in switches
-        new_pos = base .+ switch.right_turn .* right_shift .+ switch.forward .* forward_shift .+ inner_poss[switch.pos]
-        if board[new_pos] != ' '
-            println("switch=$switch")
-            println("    current   $next_pos, $(cursor.dir)")
-            println("    base      $base")
-            println("    inner     $inner_pos")
-            println("    rotated   $(inner_poss[switch.pos])")
-            println("    rightward $(switch.right_turn .* right_shift)")
-            println("    forward   $(switch.forward .* forward_shift)")
-            println("    next      $new_pos $(switch.dir(cursor.dir)): '$(board[new_pos])'")
-
-            return board[new_pos], Cursor(new_pos, switch.dir(cursor.dir))
-        end
+    inner_pos = next_pos - step(base, dir, board.side)
+    for _ in 1:link.dir-dir
+        inner_pos = Position(inner_pos.col, board.side - inner_pos.row - 1)
     end
-
-    throw("Implement me!")
+    next_pos = inner_pos + link.pos
+    return board[next_pos], next_pos, link.dir
 end
 
-function move(board::Board, pos::Position, dir::Int, steps::Int, part)::Tuple{Position,Int}
+function move(board::Board, pos::Position, dir::Direction, steps::Int, cube::Cube)::Tuple{Position,Direction}
     for _ in 1:steps
-        char, next_pos, next_dir = peek(board, pos, dir, part)
+        char, next_pos, next_dir = peek(board, pos, dir, cube)
         if char == '#'
             return pos, dir
         end
@@ -137,14 +192,14 @@ function move(board::Board, pos::Position, dir::Int, steps::Int, part)::Tuple{Po
     return pos, dir
 end
 
-function day22(board::Board, pos::Position, dir::Int, cmds::Commands, part)
+function day22(board::Board, pos::Position, dir::Direction, cmds::Commands, cube::Cube)
     for cmd in cmds
         if cmd == 'R'
             dir = turn_right(dir)
         elseif cmd == 'L'
             dir = turn_left(dir)
         else
-            pos, dir = move(board, pos, dir, cmd, part)
+            pos, dir = move(board, pos, dir, cmd, cube)
         end
     end
     return score(pos, dir)
@@ -154,13 +209,13 @@ function get_input(lines)
     cmds = Commands(lines[end])
     lines = lines[1:end-2]
     board = Board(lines)
-    pos = skip_empty_space(board, Position(0, 0), east)
+    pos = Position(0, 0)
+    while board[pos] == ' '
+        pos = step(pos, east)
+    end
     return board, pos, east, cmds
 end
 
 board, pos, dir, cmds = get_input(readlines("day22.txt"))
-println("Part 1: $(day22(board, pos, dir, cmds, Val(:part1)))") # 73346
-# println("Part 2: $(day22(board, pos, dir, cmds, Val(:part2)))") # < 147330, > 59349
-
-
-# 10 R 5 L 5 R 10 L 4 R 5 L 5
+println("Part 1:  $(day22(board, pos, dir, cmds, cube_part1(board)))") #  73346
+println("Part 2: $(day22(board, pos, dir, cmds, cube_part2(board)))")  # 106392
