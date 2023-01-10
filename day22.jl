@@ -25,7 +25,7 @@ struct Link
     dir::Direction
 end
 
-mutable struct Links
+struct Links
     links::Vector{Union{Link,Nothing}}
 end
 
